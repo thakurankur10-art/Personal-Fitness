@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Fitter Tomorrow</title>
+<meta name="theme-color" content="#4f9dff">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Fitter Tomorrow">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="icon" href="icon-192.png">
+<link rel="manifest" href="manifest.json">
+<style>
+  :root{
+    --bg:#0f1115; --panel:#171a21; --panel2:#1e222b; --border:#2a2f3a;
+    --text:#e8eaed; --muted:#9aa3b2; --accent:#4f9dff; --accent2:#ff8a5c;
+    --good:#3ecf8e; --warn:#f5b942; --bad:#ef5a6f;
+    --radius:12px;
+  }
+  @media (prefers-color-scheme: light){
+    :root{
+      --bg:#f5f6f8; --panel:#ffffff; --panel2:#f0f1f4;
+      --border:#e2e4ea; --text:#1a1d24; --muted:#5c6270;
+    }
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  body{
+    margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:var(--bg); color:var(--text); line-height:1.45;
+    padding-bottom:env(safe-area-inset-bottom);
+  }
+  .wrap{max-width:960px; margin:0 auto; padding:20px 16px 80px;}
+  header{margin-bottom:16px;}
+  h1{font-size:1.4rem; margin:0 0 4px;}
+  .sub{color:var(--muted); font-size:0.85rem;}
+  .goal-row{display:flex; gap:10px; flex-wrap:wrap; margin-top:14px;}
+  .goal-card{
+    background:var(--panel); border:1px solid var(--border); border-radius:var(--radius);
+    padding:12px 14px; flex:1; min-width:120px;
+  }
+  .goal-card .label{color:var(--muted); font-size:0.7rem; text-transform:uppercase; letter-spacing:.04em;}
+  .goal-card .val{font-size:1.2rem; font-weight:600; margin-top:2px;}
+  .goal-card .val small{font-size:0.75rem; color:var(--muted); font-weight:400;}
+  nav{
+    display:flex; gap:2px; margin:20px 0 16px; border-bottom:1px solid var(--border);
+    overflow-x:auto; -ms-overflow-style:none; scrollbar-width:none;
+  }
+  nav::-webkit-scrollbar{display:none;}
+  nav button{
+    background:none; border:none; color:var(--muted); padding:10px 12px; font-size:0.85rem;
+    cursor:pointer; border-bottom:2px solid transparent; font-weight:500; white-space:nowrap; flex-shrink:0;
+  }
+  nav button.active{color:var(--accent); border-bottom-color:var(--accent);}
+  section{display:none;}
+  section.active{display:block;}
+  .card{
+    background:var(--panel); border:1px solid var(--border); border-radius:var(--radius);
+    padding:16px 18px; margin-bottom:14px;
+  }
+  .card h2{font-size:1rem; margin:0 0 12px;}
+  label{font-size:0.82rem; color:var(--muted); display:block; margin-bottom:4px;}
+  input, select{
+    background:var(--panel2); border:1px solid var(--border); border-radius:8px; color:var(--text);
+    padding:9px 10px; font-size:1rem; width:100%;
+  }
+  .row{display:flex; gap:10px; flex-wrap:wrap; margin-bottom:10px;}
+  .row > div{flex:1; min-width:100px;}
+  button.btn{
+    background:var(--accent); color:#fff; border:none; border-radius:8px; padding:10px 16px;
+    font-size:0.88rem; cursor:pointer; font-weight:600;
+  }
+  button.btn.secondary{background:var(--panel2); color:var(--text); border:1px solid var(--border);}
+  button.btn.ghost{background:none; color:var(--accent); border:1px solid var(--accent);}
+  table{width:100%; border-collapse:collapse; font-size:0.85rem;}
+  th,td{text-align:left; padding:7px 6px; border-bottom:1px solid var(--border);}
+  th{color:var(--muted); font-weight:500; font-size:0.72rem; text-transform:uppercase;}
+  .pill{display:inline-block; padding:2px 9px; border-radius:99px; font-size:0.72rem; font-weight:600;}
+  .zone1{background:rgba(79,157,255,.15); color:#6fb1ff;}
+  .zone2{background:rgba(62,207,142,.15); color:var(--good);}
+  .zone3{background:rgba(245,185,66,.15); color:var(--warn);}
+  .zone4{background:rgba(239,90,111,.15); color:var(--bad);}
+  .zone5{background:rgba(239,90,111,.3); color:var(--bad);}
+  .exlist{list-style:none; margin:0; padding:0;}
+  .exlist li{display:flex; align-items:center; gap:8px; padding:9px 0; border-bottom:1px solid var(--border);}
+  .exlist li:last-child{border-bottom:none;}
+  .exname{flex:1.6; font-weight:500; font-size:0.9rem;}
+  .exsub{color:var(--muted); font-size:0.78rem;}
+  .exlist input{width:56px; text-align:center; padding:7px 4px;}
+  .muted{color:var(--muted);}
+  .small{font-size:0.8rem;}
+  #chart{width:100%; height:220px; display:block;}
+  .flexbtns{display:flex; gap:8px; flex-wrap:wrap; margin-top:10px;}
+  .note{
+    background:rgba(245,185,66,.1); border:1px solid rgba(245,185,66,.3); border-radius:8px;
+    padding:10px 12px; font-size:0.82rem; color:var(--text);
+  }
+  .status{
+    background:rgba(62,207,142,.1); border:1px solid rgba(62,207,142,.3); border-radius:8px;
+    padding:8px 12px; font-size:0.78rem; color:var(--good); margin-bottom:14px; display:flex; align-items:center; gap:6px;
+  }
+  .status.offline{background:rgba(239,90,111,.1); border-color:rgba(239,90,111,.3); color:var(--bad);}
+  .diet-check{display:flex; align-items:center; gap:8px; padding:7px 0;}
+  .diet-check input{width:auto;}
+  footer{margin-top:26px; color:var(--muted); font-size:0.76rem; text-align:center;}
+  ::placeholder{color:#6b7280;}
+  #installBanner{
+    display:none; position:fixed; left:12px; right:12px; bottom:12px; z-index:50;
+    background:var(--panel); border:1px solid var(--border); border-radius:var(--radius);
+    padding:12px 14px; box-shadow:0 6px 20px rgba(0,0,0,.3); align-items:center; gap:10px;
+  }
+  #installBanner span{flex:1; font-size:0.85rem;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Fitter Tomorrow</h1>
+    <div class="sub">Ankur · 34M · 5'8" · Goal: 76kg → 65kg, waist 35-36" → 30"</div>
+    <div id="saveStatus" class="status">✓ Data saved on this device</div>
+    <div class="goal-row" id="goalRow"></div>
+  </header>
+
+  <nav id="tabs">
+    <button data-tab="today" class="active">Today</button>
+    <button data-tab="progress">Progress</button>
+    <button data-tab="diet">Diet</button>
+    <button data-tab="hr">HR Zones</button>
+    <button data-tab="data">Backup</button>
+  </nav>
+
+  <!-- TODAY -->
+  <section id="today" class="active">
+    <div class="card">
+      <h2>Select Session</h2>
+      <div class="row">
+        <div>
+          <label>Day type</label>
+          <select id="dayType">
+            <option value="pushA">Push A</option>
+            <option value="pullA">Pull A</option>
+            <option value="legsA">Legs A</option>
+            <option value="pushB">Push B</option>
+            <option value="pullB">Pull B</option>
+            <option value="legsB">Legs B</option>
+            <option value="rest">Rest Day</option>
+          </select>
+        </div>
+        <div>
+          <label>Cardio today?</label>
+          <select id="cardioToggle">
+            <option value="no">No</option>
+            <option value="yes">Yes — Zone 2, 20-30 min</option>
+          </select>
+        </div>
+      </div>
+      <div class="note">Placeholder exercise list (bodyweight/dumbbell-friendly defaults) — will be swapped for equipment-specific picks once gym photos are reviewed.</div>
+    </div>
+
+    <div class="card">
+      <h2 id="sessionTitle">Push A</h2>
+      <ul class="exlist" id="exList"></ul>
+      <div class="flexbtns">
+        <button class="btn" id="saveSession">Save today's log</button>
+        <button class="btn secondary" id="clearSession">Clear inputs</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Recent Sessions</h2>
+      <table><thead><tr><th>Date</th><th>Session</th><th>Notes</th></tr></thead><tbody id="sessionHistory"></tbody></table>
+    </div>
+  </section>
+
+  <!-- PROGRESS -->
+  <section id="progress">
+    <div class="card">
+      <h2>Log Today's Numbers</h2>
+      <div class="row">
+        <div><label>Date</label><input type="date" id="logDate"></div>
+        <div><label>Weight (kg)</label><input type="number" step="0.1" id="logWeight" placeholder="76.0"></div>
+        <div><label>Waist (in)</label><input type="number" step="0.1" id="logWaist" placeholder="35.5"></div>
+        <div><label>Resting HR</label><input type="number" id="logRHR" placeholder="72"></div>
+      </div>
+      <button class="btn" id="addLog">Add entry</button>
+    </div>
+
+    <div class="card">
+      <h2>Trend</h2>
+      <canvas id="chart"></canvas>
+      <div class="small muted" id="chartLegend" style="margin-top:8px;"></div>
+    </div>
+
+    <div class="card">
+      <h2>Pace vs. Goal</h2>
+      <div id="paceSummary" class="small">Log at least two weight entries to see your weekly rate and projected finish date.</div>
+    </div>
+
+    <div class="card">
+      <h2>Log History</h2>
+      <table><thead><tr><th>Date</th><th>Weight</th><th>Waist</th><th>RHR</th><th></th></tr></thead><tbody id="logTable"></tbody></table>
+    </div>
+  </section>
+
+  <!-- DIET -->
+  <section id="diet">
+    <div class="card">
+      <h2>Daily Targets</h2>
+      <div class="goal-row">
+        <div class="goal-card"><div class="label">Calories</div><div class="val">2150-2200</div></div>
+        <div class="goal-card"><div class="label">Protein</div><div class="val">150-160g</div></div>
+        <div class="goal-card"><div class="label">Fat</div><div class="val">65-70g</div></div>
+        <div class="goal-card"><div class="label">Carbs</div><div class="val">~240g</div></div>
+      </div>
+      <div class="note" style="margin-top:14px;">Deficit ≈450-500 kcal/day off an estimated TDEE of ~2650-2700 kcal. If weight isn't trending down after 2-3 weeks of consistent logging, we lower calories by ~150 rather than guessing again.</div>
+    </div>
+
+    <div class="card">
+      <h2>Today's Meal Checklist (Indian non-veg, ~2180 kcal / 155g protein)</h2>
+      <div id="dietChecklist"></div>
+      <div class="flexbtns"><button class="btn secondary" id="resetDiet">Reset checklist</button></div>
+    </div>
+
+    <div class="card">
+      <h2>Protein Sources — Quick Reference</h2>
+      <table>
+        <thead><tr><th>Food (100g cooked)</th><th>Protein</th><th>Notes</th></tr></thead>
+        <tbody>
+          <tr><td>Chicken breast</td><td>~31g</td><td>Cheapest high-protein, low-fat</td></tr>
+          <tr><td>Eggs (2 large)</td><td>~13g</td><td>Add whites for more protein, less fat</td></tr>
+          <tr><td>Fish (rohu/pomfret)</td><td>~20-24g</td><td>Good omega-3, light to digest</td></tr>
+          <tr><td>Paneer</td><td>~18g</td><td>Higher fat — portion control</td></tr>
+          <tr><td>Curd/yogurt</td><td>~10-20g</td><td>Good for breakfast/snacks</td></tr>
+          <tr><td>Dal (cooked)</td><td>~9g</td><td>Pairs with rice for complete protein</td></tr>
+          <tr><td>Whey (1 scoop)</td><td>~24g</td><td>Optional convenience</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- HR ZONES -->
+  <section id="hr">
+    <div class="card">
+      <h2>Heart Rate Zones (Karvonen Method)</h2>
+      <div class="row">
+        <div><label>Resting HR</label><input type="number" id="rhrInput" value="72"></div>
+        <div><label>Max HR (est. 220-age)</label><input type="number" id="maxhrInput" value="186"></div>
+        <div><label>Age</label><input type="number" id="ageInput" value="34"></div>
+      </div>
+      <div class="note">Max HR is age-estimated, not lab-tested — Zone 2 should feel conversational.</div>
+      <table style="margin-top:14px;">
+        <thead><tr><th>Zone</th><th>Range</th><th>% HRR</th><th>Use</th></tr></thead>
+        <tbody id="hrTable"></tbody>
+      </table>
+    </div>
+    <div class="card">
+      <h2>Garmin Forerunner 165 Setup</h2>
+      <div class="small">Garmin Connect app → Profile → User Settings → Heart Rate → set to Heart Rate Reserve (Karvonen), or manually enter the boundaries above instead of default age-based zones.</div>
+    </div>
+  </section>
+
+  <!-- DATA -->
+  <section id="data">
+    <div class="card">
+      <h2>Storage Status</h2>
+      <div class="small" id="storageInfo">Checking...</div>
+    </div>
+    <div class="card">
+      <h2>Backup Your Data</h2>
+      <div class="note">Data auto-saves on this device (IndexedDB) — it survives closing the app, refreshing, or restarting your phone. It's still tied to this browser/device though, so export a backup occasionally, especially before switching phones or clearing browser data.</div>
+      <div class="flexbtns">
+        <button class="btn" id="exportData">Export data (JSON)</button>
+        <button class="btn secondary" id="importBtn">Import data</button>
+        <input type="file" id="importFile" accept="application/json" style="display:none;">
+      </div>
+    </div>
+  </section>
+
+  <footer>Fitter Tomorrow · v1 · Exercise list is a placeholder pending gym equipment photos.</footer>
+</div>
+
+<div id="installBanner">
+  <span>Install this as an app: tap Share → "Add to Home Screen" (iPhone) or the menu → "Install app" (Android/Chrome).</span>
+  <button class="btn secondary" onclick="document.getElementById('installBanner').style.display='none'">Got it</button>
+</div>
+
+<script>
+// ================= IndexedDB persistence layer =================
+const DB_NAME = 'fitterTomorrowDB', STORE = 'kv';
+let dbPromise = new Promise((resolve, reject)=>{
+  const req = indexedDB.open(DB_NAME, 1);
+  req.onupgradeneeded = ()=> req.result.createObjectStore(STORE);
+  req.onsuccess = ()=> resolve(req.result);
+  req.onerror = ()=> reject(req.error);
+});
+async function idbGet(key){
+  const db = await dbPromise;
+  return new Promise((res,rej)=>{
+    const tx = db.transaction(STORE,'readonly').objectStore(STORE).get(key);
+    tx.onsuccess = ()=>res(tx.result);
+    tx.onerror = ()=>rej(tx.error);
+  });
+}
+async function idbSet(key,val){
+  const db = await dbPromise;
+  return new Promise((res,rej)=>{
+    const tx = db.transaction(STORE,'readwrite').objectStore(STORE).put(val,key);
+    tx.onsuccess = ()=>res();
+    tx.onerror = ()=>rej(tx.error);
+  });
+}
+function showSaveStatus(ok){
+  const el = document.getElementById('saveStatus');
+  el.textContent = ok ? '✓ Data saved on this device' : '⚠ Save failed — export a backup now';
+  el.classList.toggle('offline', !ok);
+}
+
+// ================= State =================
+const state = {
+  logs: [],
+  sessions: [],
+  dietChecked: {},
+  hrSettings: {rhr:72, maxhr:186, age:34},
+  lastDayType: 'pushA',
+};
+
+async function persist(){
+  try{ await idbSet('state', JSON.parse(JSON.stringify(state))); showSaveStatus(true); }
+  catch(e){ console.error(e); showSaveStatus(false); }
+}
+async function loadState(){
+  try{
+    const saved = await idbGet('state');
+    if(saved){
+      Object.assign(state, saved);
+    }
+  }catch(e){ console.error(e); showSaveStatus(false); }
+}
+
+// ================= Exercise templates =================
+const templates = {
+  pushA: {title:"Push A — Chest / Shoulders / Triceps", ex:[
+    ["Flat DB / Barbell Press","4x8-10"],["Overhead Press","3x8-10"],
+    ["Incline DB Press","3x10-12"],["Lateral Raises","3x12-15"],["Triceps Pushdown / Dips","3x10-12"],
+  ]},
+  pullA: {title:"Pull A — Back / Biceps", ex:[
+    ["Deadlift (or Rack Pull)","3x6-8"],["Pull-ups / Lat Pulldown","4x8-10"],
+    ["Seated Cable Row","3x10-12"],["Face Pulls","3x15"],["Barbell / DB Curl","3x10-12"],
+  ]},
+  legsA: {title:"Legs A — Quad-focused", ex:[
+    ["Back Squat","4x6-8"],["Leg Press","3x10-12"],["Walking Lunges","3x12/leg"],
+    ["Leg Extension","3x12-15"],["Standing Calf Raise","4x15"],["Hanging Knee Raise (core)","3x12-15"],
+  ]},
+  pushB: {title:"Push B — Shoulders / Chest / Triceps (variation)", ex:[
+    ["Seated DB Shoulder Press","4x8-10"],["Incline Barbell Press","3x8-10"],
+    ["Cable Fly","3x12-15"],["Arnold Press","3x10-12"],["Overhead Triceps Extension","3x12"],
+  ]},
+  pullB: {title:"Pull B — Back / Biceps (variation)", ex:[
+    ["Barbell Row","4x8-10"],["Single-arm DB Row","3x10/side"],
+    ["Lat Pulldown (wide grip)","3x10-12"],["Rear Delt Fly","3x15"],["Hammer Curl","3x10-12"],
+  ]},
+  legsB: {title:"Legs B — Posterior chain", ex:[
+    ["Romanian Deadlift","4x8-10"],["Bulgarian Split Squat","3x10/leg"],["Hip Thrust","3x10-12"],
+    ["Leg Curl","3x12-15"],["Seated Calf Raise","4x15"],["Plank (core)","3x45-60s"],
+  ]},
+  rest: {title:"Rest Day", ex:[["Light walk (optional)","20-30 min, easy pace"],["Mobility / stretching","10-15 min"]]},
+};
+
+const dietItems = [
+  "Breakfast: 3 eggs (or 2 whole + 3 whites) + 2 roti / oats bowl",
+  "Mid-morning: Curd or a fruit",
+  "Lunch: 150g chicken/fish curry + 1 cup rice + dal + vegetable sabzi",
+  "Evening snack: Roasted chana / sprouts / a handful of nuts",
+  "Dinner: 150-180g chicken/fish/paneer + 2 roti or small rice + salad",
+  "Hydration: 3+ litres water through the day",
+  "Cooking oil/ghee: keep to ~2-3 tsp total for the day",
+];
+
+// ================= Tabs =================
+document.querySelectorAll('#tabs button').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('#tabs button').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('section').forEach(s=>s.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById(btn.dataset.tab).classList.add('active');
+  });
+});
+
+// ================= Goal cards =================
+function renderGoalRow(){
+  const latest = state.logs[state.logs.length-1];
+  const w = latest ? latest.weight : 76;
+  const wa = latest ? latest.waist : 35.5;
+  document.getElementById('goalRow').innerHTML = `
+    <div class="goal-card"><div class="label">Current Weight</div><div class="val">${w}kg <small>→ 65kg</small></div></div>
+    <div class="goal-card"><div class="label">Current Waist</div><div class="val">${wa}" <small>→ 30"</small></div></div>
+    <div class="goal-card"><div class="label">To Lose</div><div class="val">${(w-65).toFixed(1)}kg</div></div>
+    <div class="goal-card"><div class="label">Training Days</div><div class="val">5-6 <small>/week</small></div></div>
+  `;
+}
+
+// ================= Today's session =================
+function renderSession(){
+  const type = document.getElementById('dayType').value;
+  state.lastDayType = type;
+  const t = templates[type];
+  document.getElementById('sessionTitle').textContent = t.title;
+  const list = document.getElementById('exList');
+  list.innerHTML = '';
+  t.ex.forEach(([name,scheme])=>{
+    const li = document.createElement('li');
+    li.innerHTML = `<div class="exname">${name}<div class="exsub">${scheme}</div></div>
+      <input type="text" inputmode="decimal" placeholder="kg" class="weightIn">
+      <input type="text" inputmode="numeric" placeholder="reps" class="repsIn">`;
+    list.appendChild(li);
+  });
+  persist();
+}
+document.getElementById('dayType').addEventListener('change', renderSession);
+
+document.getElementById('saveSession').addEventListener('click', ()=>{
+  const type = document.getElementById('dayType').value;
+  const cardio = document.getElementById('cardioToggle').value;
+  const rows = [...document.querySelectorAll('#exList li')].map(li=>{
+    const name = li.querySelector('.exname').firstChild.textContent;
+    const w = li.querySelector('.weightIn').value;
+    const r = li.querySelector('.repsIn').value;
+    return `${name}: ${w||'-'}kg x ${r||'-'}`;
+  }).join(' | ');
+  state.sessions.unshift({date:new Date().toISOString().slice(0,10), type:templates[type].title, notes: rows + (cardio==='yes' ? ' + Zone2 cardio 20-30min' : '')});
+  renderHistory();
+  persist();
+});
+document.getElementById('clearSession').addEventListener('click', renderSession);
+
+function renderHistory(){
+  const tb = document.getElementById('sessionHistory');
+  tb.innerHTML = state.sessions.slice(0,10).map(s=>`<tr><td>${s.date}</td><td>${s.type}</td><td class="small muted">${s.notes}</td></tr>`).join('') || '<tr><td colspan="3" class="muted small">No sessions logged yet.</td></tr>';
+}
+
+// ================= Progress log =================
+document.getElementById('logDate').value = new Date().toISOString().slice(0,10);
+
+document.getElementById('addLog').addEventListener('click', ()=>{
+  const date = document.getElementById('logDate').value;
+  const weight = parseFloat(document.getElementById('logWeight').value);
+  const waist = parseFloat(document.getElementById('logWaist').value);
+  const rhr = parseFloat(document.getElementById('logRHR').value);
+  if(!date || isNaN(weight)){ alert('Please enter at least a date and weight.'); return; }
+  state.logs = state.logs.filter(l=>l.date!==date);
+  state.logs.push({date, weight, waist: isNaN(waist)?null:waist, rhr: isNaN(rhr)?null:rhr});
+  state.logs.sort((a,b)=>a.date.localeCompare(b.date));
+  document.getElementById('logWeight').value='';
+  document.getElementById('logWaist').value='';
+  document.getElementById('logRHR').value='';
+  renderAll();
+  persist();
+});
+
+function renderLogTable(){
+  const tb = document.getElementById('logTable');
+  tb.innerHTML = state.logs.slice().reverse().map(l=>`
+    <tr><td>${l.date}</td><td>${l.weight}kg</td><td>${l.waist??'-'}</td><td>${l.rhr??'-'}</td>
+    <td><button class="btn ghost" style="padding:3px 8px;font-size:.75rem" onclick="deleteLog('${l.date}')">✕</button></td></tr>
+  `).join('') || '<tr><td colspan="5" class="muted small">No entries yet.</td></tr>';
+}
+function deleteLog(date){
+  state.logs = state.logs.filter(l=>l.date!==date);
+  renderAll();
+  persist();
+}
+
+function renderPace(){
+  const el = document.getElementById('paceSummary');
+  if(state.logs.length<2){ el.textContent='Log at least two weight entries to see your weekly rate and projected finish date.'; return; }
+  const first = state.logs[0], last = state.logs[state.logs.length-1];
+  const days = (new Date(last.date)-new Date(first.date))/86400000;
+  if(days<=0){ el.textContent='Need entries on different dates.'; return; }
+  const weeklyRate = (first.weight-last.weight)/(days/7);
+  const remaining = last.weight-65;
+  const weeksLeft = weeklyRate>0 ? remaining/weeklyRate : null;
+  let msg = `Weekly rate: <b>${weeklyRate.toFixed(2)}kg/week</b>. `;
+  if(weeklyRate<=0){
+    msg += `Not trending down yet — normal in week 1-2, but if it holds past 3 weeks, tighten calories by ~150/day.`;
+  } else if(weeklyRate>0.9){
+    msg += `Faster than the recommended 0.4-0.6kg/week — likely water/muscle loss, not just fat. Consider eating slightly more.`;
+  } else {
+    const eta = new Date(Date.now()+weeksLeft*7*86400000);
+    msg += `At this rate, ~65kg by <b>${eta.toDateString()}</b> (${Math.round(weeksLeft)} weeks out).`;
+  }
+  el.innerHTML = msg;
+}
+
+function renderChart(){
+  const c = document.getElementById('chart');
+  const ctx = c.getContext('2d');
+  const dpr = window.devicePixelRatio||1;
+  const w = c.clientWidth||600, h=220;
+  c.width = w*dpr; c.height = h*dpr; ctx.scale(dpr,dpr);
+  ctx.clearRect(0,0,w,h);
+  document.getElementById('chartLegend').innerHTML = '<span style="color:#4f9dff">●</span> Weight (kg) &nbsp; <span style="color:#ff8a5c">●</span> Waist (in)';
+  if(state.logs.length<2){
+    ctx.fillStyle = getComputedStyle(document.body).getPropertyValue('--muted');
+    ctx.font='13px sans-serif';
+    ctx.fillText('Add at least 2 log entries to see the trend chart.', 10, h/2);
+    return;
+  }
+  const pad = {l:40,r:20,t:15,b:25};
+  const weights = state.logs.map(l=>l.weight);
+  const waists = state.logs.filter(l=>l.waist).map(l=>l.waist);
+  const minW = Math.min(...weights,64), maxW = Math.max(...weights,77);
+  const plotW = w-pad.l-pad.r, plotH = h-pad.t-pad.b;
+  const x = i => pad.l + (i/(state.logs.length-1))*plotW;
+  const yW = v => pad.t + (1-(v-minW)/(maxW-minW))*plotH;
+  ctx.strokeStyle = 'rgba(150,150,150,0.15)';
+  ctx.beginPath();
+  for(let i=0;i<=4;i++){ const gy = pad.t + i*plotH/4; ctx.moveTo(pad.l,gy); ctx.lineTo(w-pad.r,gy); }
+  ctx.stroke();
+  ctx.strokeStyle = '#4f9dff'; ctx.lineWidth=2; ctx.beginPath();
+  state.logs.forEach((l,i)=>{ const px=x(i), py=yW(l.weight); i===0?ctx.moveTo(px,py):ctx.lineTo(px,py); });
+  ctx.stroke();
+  state.logs.forEach((l,i)=>{ ctx.fillStyle='#4f9dff'; ctx.beginPath(); ctx.arc(x(i),yW(l.weight),3,0,7); ctx.fill(); });
+  if(waists.length>1){
+    const minWa = Math.min(...waists,29), maxWa = Math.max(...waists,36);
+    const yWa = v => pad.t + (1-(v-minWa)/(maxWa-minWa))*plotH;
+    ctx.strokeStyle = '#ff8a5c'; ctx.beginPath();
+    let started=false;
+    state.logs.forEach((l,i)=>{
+      if(!l.waist) return;
+      const px=x(i), py=yWa(l.waist);
+      if(!started){ ctx.moveTo(px,py); started=true; } else ctx.lineTo(px,py);
+    });
+    ctx.stroke();
+  }
+  ctx.fillStyle = getComputedStyle(document.body).getPropertyValue('--muted');
+  ctx.font='11px sans-serif';
+  ctx.fillText(minW.toFixed(0), 4, yW(minW)+4);
+  ctx.fillText(maxW.toFixed(0), 4, yW(maxW)+4);
+}
+
+function renderAll(){
+  renderGoalRow();
+  renderLogTable();
+  renderPace();
+  renderChart();
+}
+
+// ================= Diet checklist =================
+function renderDiet(){
+  const el = document.getElementById('dietChecklist');
+  el.innerHTML = dietItems.map((item,i)=>`
+    <div class="diet-check"><input type="checkbox" id="d${i}" ${state.dietChecked[i]?'checked':''}><label for="d${i}" style="margin:0;color:var(--text);font-size:0.88rem;">${item}</label></div>
+  `).join('');
+  dietItems.forEach((_,i)=>{
+    document.getElementById('d'+i).addEventListener('change', (e)=>{
+      state.dietChecked[i] = e.target.checked;
+      persist();
+    });
+  });
+}
+document.getElementById('resetDiet').addEventListener('click', ()=>{
+  state.dietChecked = {};
+  renderDiet();
+  persist();
+});
+
+// ================= HR Zones =================
+function computeZones(){
+  const rhr = parseFloat(document.getElementById('rhrInput').value)||72;
+  const maxhr = parseFloat(document.getElementById('maxhrInput').value)||186;
+  const hrr = maxhr-rhr;
+  const zones = [
+    ["Zone 1 — Recovery","zone1",0.5,0.6,"Active recovery, warm-up/cool-down"],
+    ["Zone 2 — Aerobic base","zone2",0.6,0.7,"Main cardio zone — builds stamina, low heart strain"],
+    ["Zone 3 — Tempo","zone3",0.7,0.8,"Occasional, once aerobic base is established"],
+    ["Zone 4 — Threshold","zone4",0.8,0.9,"Limit until BP checked + base built"],
+    ["Zone 5 — Max","zone5",0.9,1.0,"Avoid regularly — sprint/max effort only"],
+  ];
+  const tb = document.getElementById('hrTable');
+  tb.innerHTML = zones.map(([name,cls,lo,hi,use])=>{
+    const loBpm = Math.round(rhr+lo*hrr), hiBpm = Math.round(rhr+hi*hrr);
+    return `<tr><td><span class="pill ${cls}">${name}</span></td><td>${loBpm}-${hiBpm} bpm</td><td>${Math.round(lo*100)}-${Math.round(hi*100)}%</td><td class="small muted">${use}</td></tr>`;
+  }).join('');
+  state.hrSettings = {rhr, maxhr, age: parseFloat(document.getElementById('ageInput').value)||34};
+  persist();
+}
+['rhrInput','maxhrInput','ageInput'].forEach(id=>{
+  document.getElementById(id).addEventListener('input', ()=>{
+    if(id==='ageInput'){
+      const age = parseFloat(document.getElementById('ageInput').value)||34;
+      document.getElementById('maxhrInput').value = 220-age;
+    }
+    computeZones();
+  });
+});
+
+// ================= Export / Import =================
+document.getElementById('exportData').addEventListener('click', ()=>{
+  const blob = new Blob([JSON.stringify(state,null,2)], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `fitter-tomorrow-backup-${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+});
+document.getElementById('importBtn').addEventListener('click', ()=> document.getElementById('importFile').click());
+document.getElementById('importFile').addEventListener('change', (e)=>{
+  const file = e.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = ()=>{
+    try{
+      const data = JSON.parse(reader.result);
+      Object.assign(state, data);
+      renderSession(); renderHistory(); renderDiet(); computeZones(); renderAll();
+      persist();
+      alert('Data imported.');
+    }catch(err){ alert('Invalid file.'); }
+  };
+  reader.readAsText(file);
+});
+
+// ================= Storage info =================
+async function renderStorageInfo(){
+  const el = document.getElementById('storageInfo');
+  if(navigator.storage && navigator.storage.estimate){
+    try{
+      const est = await navigator.storage.estimate();
+      const usedKB = ((est.usage||0)/1024).toFixed(1);
+      el.innerHTML = `Using ~${usedKB} KB of local storage. ${state.logs.length} weight entries, ${state.sessions.length} workout sessions saved on this device.`;
+    }catch(e){ el.textContent = `${state.logs.length} weight entries, ${state.sessions.length} workout sessions saved on this device.`; }
+  } else {
+    el.textContent = `${state.logs.length} weight entries, ${state.sessions.length} workout sessions saved on this device.`;
+  }
+}
+
+// ================= Install banner =================
+let deferredPrompt;
+window.addEventListener('beforeinstallprompt', (e)=>{
+  e.preventDefault();
+  deferredPrompt = e;
+  document.getElementById('installBanner').style.display = 'flex';
+});
+const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+if(isIOS && !isStandalone){
+  document.getElementById('installBanner').style.display = 'flex';
+}
+
+// ================= Service worker =================
+if('serviceWorker' in navigator){
+  window.addEventListener('load', ()=>{
+    navigator.serviceWorker.register('sw.js').catch(()=>{});
+  });
+}
+
+// ================= Init =================
+async function init(){
+  await loadState();
+  document.getElementById('dayType').value = state.lastDayType || 'pushA';
+  document.getElementById('rhrInput').value = state.hrSettings.rhr;
+  document.getElementById('maxhrInput').value = state.hrSettings.maxhr;
+  document.getElementById('ageInput').value = state.hrSettings.age;
+  renderSession();
+  renderHistory();
+  renderDiet();
+  computeZones();
+  renderAll();
+  renderStorageInfo();
+}
+init();
+window.addEventListener('resize', renderChart);
+</script>
+</body>
+</html>
