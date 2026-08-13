@@ -3,25 +3,25 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>Fitter Tomorrow</title>
-<meta name="theme-color" content="#4f9dff">
+<title>Forge</title>
+<meta name="theme-color" content="#0a0d12">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Fitter Tomorrow">
+<meta name="apple-mobile-web-app-title" content="Forge">
 <link rel="apple-touch-icon" href="icon-192.png">
 <link rel="icon" href="icon-192.png">
 <link rel="manifest" href="manifest.json">
 <style>
   :root{
-    --bg:#0f1115; --panel:#171a21; --panel2:#1e222b; --border:#2a2f3a;
-    --text:#e8eaed; --muted:#9aa3b2; --accent:#4f9dff; --accent2:#ff8a5c;
+    --bg:#0a0d12; --panel:#12151b; --panel2:#181c24; --border:rgba(255,255,255,.06);
+    --text:#eef1f5; --muted:#8a92a3; --accent:#5ec8f2; --accent2:#5ec8f2;
     --good:#3ecf8e; --warn:#f5b942; --bad:#ef5a6f;
-    --radius:12px;
+    --radius:14px;
   }
   @media (prefers-color-scheme: light){
     :root{
-      --bg:#f5f6f8; --panel:#ffffff; --panel2:#f0f1f4;
-      --border:#e2e4ea; --text:#1a1d24; --muted:#5c6270;
+      --bg:#f7f8fa; --panel:#ffffff; --panel2:#f2f4f7;
+      --border:rgba(0,0,0,.06); --text:#14171d; --muted:#6b7280;
     }
   }
   *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
@@ -56,9 +56,9 @@
   section.active{display:block;}
   .card{
     background:var(--panel); border:1px solid var(--border); border-radius:var(--radius);
-    padding:16px 18px; margin-bottom:14px;
+    padding:18px 20px; margin-bottom:16px;
   }
-  .card h2{font-size:1rem; margin:0 0 12px;}
+  .card h2{font-size:0.95rem; margin:0 0 14px; font-weight:600; letter-spacing:.01em;}
   label{font-size:0.82rem; color:var(--muted); display:block; margin-bottom:4px;}
   input, select{
     background:var(--panel2); border:1px solid var(--border); border-radius:8px; color:var(--text);
@@ -110,22 +110,89 @@
     padding:12px 14px; box-shadow:0 6px 20px rgba(0,0,0,.3); align-items:center; gap:10px;
   }
   #installBanner span{flex:1; font-size:0.85rem;}
+
+  /* Exercise list rows */
+  .exlist li{cursor:pointer;}
+  .exlist li:active{background:var(--panel2);}
+  .exlist .exdone{color:var(--good);}
+  .exlist li .check{
+    width:22px; height:22px; border-radius:50%; border:2px solid var(--border); flex-shrink:0;
+    display:flex; align-items:center; justify-content:center; font-size:0.75rem; color:transparent;
+  }
+  .exlist li.done .check{background:var(--good); border-color:var(--good); color:#06231a;}
+  .exlist li.done .exname{color:var(--good);}
+
+  /* Overlay */
+  .overlay{
+    display:none; position:fixed; inset:0; background:var(--bg); z-index:100;
+    overflow-y:auto; -webkit-overflow-scrolling:touch;
+  }
+  .overlay.active{display:block;}
+  .overlay-inner{max-width:960px; margin:0 auto; padding:16px 16px 100px;}
+  .overlay-head{display:flex; align-items:center; justify-content:space-between;}
+  .overlay-progress{font-size:0.78rem; color:var(--muted);}
+  .anim-wrap{
+    width:100%; aspect-ratio:4/3; background:var(--panel2); border-radius:var(--radius); overflow:hidden;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .anim-frame{width:100%; height:100%; object-fit:cover; animation:frameSwap 2.4s steps(1) infinite;}
+  @keyframes frameSwap{ 0%,45%{opacity:1;} 50%,95%{opacity:1;} }
+
+  /* Muscle diagram */
+  #bodyDiagram svg{width:100%; max-width:220px; display:block; margin:0 auto;}
+  .body-region{fill:var(--panel2); stroke:var(--border); stroke-width:1; transition:fill .2s;}
+  .body-region.primary{fill:var(--accent);}
+  .body-region.secondary{fill:var(--accent); opacity:0.4;}
+  .legend-dot{display:inline-block; width:9px; height:9px; border-radius:50%; margin-right:4px;}
+  .legend-primary{background:var(--accent);}
+  .legend-secondary{background:var(--accent); opacity:0.4;}
+
+  /* Counter / timer */
+  .counter-box{display:flex; align-items:center; justify-content:center; gap:20px; padding:10px 0;}
+  .counter-btn{
+    width:52px; height:52px; border-radius:50%; background:var(--panel2); border:1px solid var(--border);
+    color:var(--text); font-size:1.4rem; display:flex; align-items:center; justify-content:center; cursor:pointer;
+  }
+  .counter-num{font-size:2.6rem; font-weight:700; min-width:90px; text-align:center; font-variant-numeric:tabular-nums;}
+  .counter-target{text-align:center; color:var(--muted); font-size:0.82rem; margin-top:4px;}
+  .set-row{display:flex; align-items:center; gap:8px; padding:8px 0; border-bottom:1px solid var(--border); font-size:0.88rem;}
+  .set-row:last-child{border-bottom:none;}
+  .set-row input{width:64px; text-align:center;}
+
+  /* Slide to complete */
+  .slider-wrap{position:sticky; bottom:12px; margin-top:20px;}
+  .slider-track{
+    position:relative; height:56px; background:var(--panel2); border:1px solid var(--border); border-radius:28px;
+    overflow:hidden; user-select:none; touch-action:none;
+  }
+  .slider-fill{position:absolute; inset:0; width:0; background:rgba(94,200,242,.25); border-radius:28px;}
+  .slider-label{
+    position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+    color:var(--muted); font-size:0.88rem; font-weight:500; pointer-events:none;
+  }
+  .slider-thumb{
+    position:absolute; left:3px; top:3px; width:50px; height:50px; border-radius:50%; background:var(--accent);
+    color:#06232f; display:flex; align-items:center; justify-content:center; font-size:1.3rem; font-weight:700; cursor:grab;
+  }
+  .slider-track.complete .slider-fill{width:100% !important;}
+  .slider-track.complete .slider-label{color:var(--good); }
 </style>
 </head>
 <body>
 <div class="wrap">
   <header>
-    <h1>Fitter Tomorrow</h1>
-    <div class="sub">Ankur · 34M · 5'8" · Goal: 76kg → 65kg, waist 35-36" → 30"</div>
+    <h1>Forge</h1>
+    <div class="sub" id="greeting">Let's train.</div>
     <div id="saveStatus" class="status">✓ Data saved on this device</div>
-    <div class="goal-row" id="goalRow"></div>
   </header>
 
   <nav id="tabs">
     <button data-tab="today" class="active">Today</button>
+    <button data-tab="calories">Calories</button>
     <button data-tab="progress">Progress</button>
     <button data-tab="diet">Diet</button>
     <button data-tab="hr">HR Zones</button>
+    <button data-tab="profile">Profile</button>
     <button data-tab="data">Backup</button>
   </nav>
 
@@ -143,32 +210,77 @@
             <option value="pushB">Push B</option>
             <option value="pullB">Pull B</option>
             <option value="legsB">Legs B</option>
+            <option value="cardioDay">Cardio Focus Day</option>
             <option value="rest">Rest Day</option>
           </select>
         </div>
-        <div>
-          <label>Cardio today?</label>
-          <select id="cardioToggle">
-            <option value="no">No</option>
-            <option value="yes">Yes — Zone 2, 20-30 min</option>
-          </select>
-        </div>
       </div>
-      <div class="note">Placeholder exercise list (bodyweight/dumbbell-friendly defaults) — will be swapped for equipment-specific picks once gym photos are reviewed.</div>
+      <div class="note">Matched to your actual gym: barbell rack + bench, dumbbell rack, Life Fitness chest press, lat pulldown/low row, leg press + calf combo, leg extension/curl, cable functional trainer, treadmills, elliptical, recumbent bike, and your yoga mat for core/mobility work.</div>
     </div>
 
     <div class="card">
       <h2 id="sessionTitle">Push A</h2>
+      <div class="small muted" style="margin-bottom:10px;">Tap an exercise to see form, target reps/weight, and log your set.</div>
       <ul class="exlist" id="exList"></ul>
       <div class="flexbtns">
-        <button class="btn" id="saveSession">Save today's log</button>
-        <button class="btn secondary" id="clearSession">Clear inputs</button>
+        <button class="btn secondary" id="clearSession">Reset today's checkmarks</button>
+      </div>
+    </div>
+
+    <div class="card" id="cooldownCard" style="display:none;">
+      <h2>Cooldown &amp; Stretch</h2>
+      <div class="small muted" style="margin-bottom:10px;">Matched to the muscles you trained today — tap to start a hold timer.</div>
+      <ul class="exlist" id="cooldownList"></ul>
+    </div>
+
+    <div class="card">
+      <h2>Recent Exercise Log</h2>
+      <table><thead><tr><th>Date</th><th>Exercise</th><th>Sets</th></tr></thead><tbody id="sessionHistory"></tbody></table>
+    </div>
+  </section>
+
+  <!-- CALORIES -->
+  <section id="calories">
+    <div class="card">
+      <h2>Log Food</h2>
+      <div class="row">
+        <div><label>Date</label><input type="date" id="foodDate"></div>
+      </div>
+      <div class="row">
+        <div style="flex:2;">
+          <label>Food</label>
+          <input type="text" id="foodName" list="foodOptions" placeholder="Start typing e.g. chicken, roti, dal...">
+          <datalist id="foodOptions"></datalist>
+        </div>
+        <div>
+          <label>Amount (g/ml)</label>
+          <input type="number" id="foodGrams" placeholder="150">
+        </div>
+      </div>
+      <div id="foodPreview" class="small muted" style="margin-bottom:8px;"></div>
+      <div class="flexbtns">
+        <button class="btn" id="addFood">Add to log</button>
+        <button class="btn secondary" id="customFoodBtn">Not in list? Add custom</button>
+      </div>
+      <div id="customFoodRow" style="display:none; margin-top:12px;">
+        <div class="row">
+          <div><label>kcal per 100g</label><input type="number" id="customKcal" placeholder="165"></div>
+          <div><label>Protein g/100g</label><input type="number" id="customProtein" placeholder="20"></div>
+          <div><label>Carbs g/100g</label><input type="number" id="customCarbs" placeholder="5"></div>
+          <div><label>Fat g/100g</label><input type="number" id="customFat" placeholder="8"></div>
+        </div>
+        <div class="note">Estimate this from a packet label or a quick search if unsure — even a rough number logged consistently beats not logging at all.</div>
       </div>
     </div>
 
     <div class="card">
-      <h2>Recent Sessions</h2>
-      <table><thead><tr><th>Date</th><th>Session</th><th>Notes</th></tr></thead><tbody id="sessionHistory"></tbody></table>
+      <h2>Today's Totals</h2>
+      <div class="goal-row" id="calSummary"></div>
+    </div>
+
+    <div class="card">
+      <h2>Food Log — <span id="foodLogDateLabel"></span></h2>
+      <table><thead><tr><th>Food</th><th>Amt</th><th>kcal</th><th>Protein</th><th></th></tr></thead><tbody id="foodLogTable"></tbody></table>
     </div>
   </section>
 
@@ -259,6 +371,26 @@
     </div>
   </section>
 
+  <!-- PROFILE -->
+  <section id="profile">
+    <div class="card">
+      <h2>About</h2>
+      <div class="small muted">Ankur · 34, male · 5'8" · Resting HR 72bpm</div>
+    </div>
+    <div class="card">
+      <h2>Your Goals</h2>
+      <div class="goal-row" id="goalRow"></div>
+    </div>
+    <div class="card">
+      <h2>The Plan</h2>
+      <div class="small">
+        6-day Push/Pull/Legs split, 1 rest day. Calorie target 2150-2200/day (≈450-500 kcal deficit), protein 150-160g/day.
+        Zone 2 cardio 3x/week for stamina and heart health without high strain. Realistic timeline: 6-8 months for the full
+        76→65kg, 35-36"→30" waist goal, moderated by periodic maintenance weeks.
+      </div>
+    </div>
+  </section>
+
   <!-- DATA -->
   <section id="data">
     <div class="card">
@@ -276,7 +408,7 @@
     </div>
   </section>
 
-  <footer>Fitter Tomorrow · v1 · Exercise list is a placeholder pending gym equipment photos.</footer>
+  <footer>Forge · v3 · Built for Ankur's training.</footer>
 </div>
 
 <div id="installBanner">
@@ -284,6 +416,54 @@
   <button class="btn secondary" onclick="document.getElementById('installBanner').style.display='none'">Got it</button>
 </div>
 
+<!-- EXERCISE DETAIL OVERLAY -->
+<div id="exOverlay" class="overlay">
+  <div class="overlay-inner">
+    <div class="overlay-head">
+      <button class="btn ghost" id="exClose" style="padding:6px 12px;">✕ Close</button>
+      <div class="overlay-progress" id="exProgress"></div>
+    </div>
+
+    <h2 id="exTitle" style="margin:14px 0 4px;"></h2>
+    <div class="small muted" id="exScheme" style="margin-bottom:14px;"></div>
+
+    <div class="anim-wrap">
+      <img id="exFrame" class="anim-frame" src="" alt="">
+    </div>
+
+    <div class="card" style="margin-top:14px;">
+      <h2>Muscles Worked</h2>
+      <div id="bodyDiagram"></div>
+      <div class="small muted" style="margin-top:8px;"><span class="legend-dot legend-primary"></span> Primary &nbsp; <span class="legend-dot legend-secondary"></span> Secondary</div>
+    </div>
+
+    <div class="card">
+      <h2>Target Today</h2>
+      <div id="exRecommend"></div>
+    </div>
+
+    <div class="card" id="exCounterCard">
+      <h2>Log This Exercise</h2>
+      <div id="exCounterArea"></div>
+    </div>
+
+    <div class="card" id="exFormCard">
+      <h2>Form Cues</h2>
+      <ol class="small" id="exInstructions" style="padding-left:18px; margin:0;"></ol>
+    </div>
+
+    <div class="slider-wrap">
+      <div class="slider-track" id="sliderTrack">
+        <div class="slider-fill" id="sliderFill"></div>
+        <div class="slider-label" id="sliderLabel">Slide to mark done →</div>
+        <div class="slider-thumb" id="sliderThumb">›</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="exercises.js"></script>
+<script src="stretches.js"></script>
 <script>
 // ================= IndexedDB persistence layer =================
 const DB_NAME = 'fitterTomorrowDB', STORE = 'kv';
@@ -322,7 +502,54 @@ const state = {
   dietChecked: {},
   hrSettings: {rhr:72, maxhr:186, age:34},
   lastDayType: 'pushA',
+  foodLog: {},   // { 'YYYY-MM-DD': [{name, grams, kcal, protein, carbs, fat}] }
+  exerciseHistory: {},  // { slug: [{date, sets:[{reps,weight} or {duration}]}] }
+  completedToday: null, // {date, dayType, slugs:[]}
 };
+
+// Targets (from the diet plan)
+const CAL_TARGET = 2180, PROTEIN_TARGET = 155;
+
+// ================= Food database (per 100g / 100ml, cooked/edible unless noted) =================
+// Estimates — home-cooked Indian dishes vary a lot with oil/ghee; treat these as starting points, not lab values.
+const FOOD_DB = [
+  ["Chicken breast, cooked", 165, 31, 0, 3.6],
+  ["Chicken curry (home-style, medium oil)", 200, 18, 5, 12],
+  ["Chicken tikka / tandoori (no gravy)", 170, 25, 2, 7],
+  ["Fish curry (rohu/pomfret, medium oil)", 150, 18, 4, 7],
+  ["Fish, grilled/tandoori", 120, 22, 0, 3],
+  ["Egg, whole, boiled/fried plain", 155, 13, 1.1, 11],
+  ["Egg white only", 52, 11, 0.7, 0.2],
+  ["Paneer, cooked (e.g. paneer curry)", 265, 18, 4, 20],
+  ["Mutton curry (home-style)", 250, 20, 5, 17],
+  ["Curd / yogurt, plain", 60, 3.5, 4.7, 3.3],
+  ["Greek yogurt, plain", 70, 10, 3.6, 1.5],
+  ["Milk, toned", 58, 3.1, 4.7, 3],
+  ["Rice, cooked (white)", 130, 2.7, 28, 0.3],
+  ["Rice, cooked (brown)", 123, 2.6, 26, 1],
+  ["Roti / chapati (no oil)", 240, 8, 46, 3.7],
+  ["Paratha (with oil/ghee)", 330, 6, 40, 15],
+  ["Dal, cooked (moong/toor)", 110, 7, 19, 0.5],
+  ["Rajma / chole (cooked, gravy)", 140, 8, 20, 4],
+  ["Mixed vegetable sabzi (with oil)", 120, 2, 10, 8],
+  ["Salad (cucumber/tomato/onion, no dressing)", 20, 1, 4, 0.1],
+  ["Sweet potato, boiled", 86, 1.6, 20, 0.1],
+  ["Potato, boiled", 87, 1.9, 20, 0.1],
+  ["Oats, dry (uncooked)", 389, 16.9, 66, 6.9],
+  ["Banana", 89, 1.1, 23, 0.3],
+  ["Apple", 52, 0.3, 14, 0.2],
+  ["Almonds", 579, 21, 22, 50],
+  ["Peanuts, roasted", 567, 26, 16, 49],
+  ["Roasted chana", 164, 9, 27, 2.6],
+  ["Whey protein powder", 380, 80, 8, 6],
+  ["Whole wheat bread, slice", 265, 9, 43, 3.5],
+  ["Ghee", 900, 0, 0, 100],
+  ["Cooking oil", 884, 0, 0, 100],
+  ["Idli", 158, 4, 32, 1],
+  ["Dosa (plain)", 168, 3.9, 28, 3.7],
+  ["Poha", 130, 2.5, 24, 3],
+  ["Upma", 150, 3.5, 22, 5],
+];
 
 async function persist(){
   try{ await idbSet('state', JSON.parse(JSON.stringify(state))); showSaveStatus(true); }
@@ -337,34 +564,460 @@ async function loadState(){
   }catch(e){ console.error(e); showSaveStatus(false); }
 }
 
-// ================= Exercise templates =================
-const templates = {
-  pushA: {title:"Push A — Chest / Shoulders / Triceps", ex:[
-    ["Flat DB / Barbell Press","4x8-10"],["Overhead Press","3x8-10"],
-    ["Incline DB Press","3x10-12"],["Lateral Raises","3x12-15"],["Triceps Pushdown / Dips","3x10-12"],
-  ]},
-  pullA: {title:"Pull A — Back / Biceps", ex:[
-    ["Deadlift (or Rack Pull)","3x6-8"],["Pull-ups / Lat Pulldown","4x8-10"],
-    ["Seated Cable Row","3x10-12"],["Face Pulls","3x15"],["Barbell / DB Curl","3x10-12"],
-  ]},
-  legsA: {title:"Legs A — Quad-focused", ex:[
-    ["Back Squat","4x6-8"],["Leg Press","3x10-12"],["Walking Lunges","3x12/leg"],
-    ["Leg Extension","3x12-15"],["Standing Calf Raise","4x15"],["Hanging Knee Raise (core)","3x12-15"],
-  ]},
-  pushB: {title:"Push B — Shoulders / Chest / Triceps (variation)", ex:[
-    ["Seated DB Shoulder Press","4x8-10"],["Incline Barbell Press","3x8-10"],
-    ["Cable Fly","3x12-15"],["Arnold Press","3x10-12"],["Overhead Triceps Extension","3x12"],
-  ]},
-  pullB: {title:"Pull B — Back / Biceps (variation)", ex:[
-    ["Barbell Row","4x8-10"],["Single-arm DB Row","3x10/side"],
-    ["Lat Pulldown (wide grip)","3x10-12"],["Rear Delt Fly","3x15"],["Hammer Curl","3x10-12"],
-  ]},
-  legsB: {title:"Legs B — Posterior chain", ex:[
-    ["Romanian Deadlift","4x8-10"],["Bulgarian Split Squat","3x10/leg"],["Hip Thrust","3x10-12"],
-    ["Leg Curl","3x12-15"],["Seated Calf Raise","4x15"],["Plank (core)","3x45-60s"],
-  ]},
-  rest: {title:"Rest Day", ex:[["Light walk (optional)","20-30 min, easy pace"],["Mobility / stretching","10-15 min"]]},
+// ================= Day → exercise slug lists (data lives in exercises.js) =================
+const DAY_META = {
+  pushA: {title:"Push A — Chest / Shoulders / Triceps"},
+  pullA: {title:"Pull A — Back / Biceps"},
+  legsA: {title:"Legs A — Quad-focused"},
+  pushB: {title:"Push B — Shoulders / Chest / Triceps (variation)"},
+  pullB: {title:"Pull B — Back / Biceps (variation)"},
+  legsB: {title:"Legs B — Posterior chain"},
+  cardioDay: {title:"Cardio Focus — Zone 2"},
+  rest: {title:"Rest Day"},
 };
+const DAY_EXERCISES = {
+  pushA: ['barbell-bench-press','machine-chest-press','incline-db-press','cable-lateral-raise','cable-triceps-pushdown','dead-bug'],
+  pullA: ['barbell-deadlift','lat-pulldown','low-row','cable-face-pull','cable-biceps-curl'],
+  legsA: ['barbell-back-squat','leg-press','db-walking-lunges','leg-extension','calf-extension','hanging-knee-raise'],
+  pushB: ['cable-shoulder-press','incline-barbell-press','db-flat-fly','arnold-press','cable-overhead-triceps'],
+  pullB: ['barbell-row','single-arm-db-row','lat-pulldown','cable-rear-delt-fly','db-hammer-curl'],
+  legsB: ['romanian-deadlift','bulgarian-split-squat','leg-curl','db-hip-thrust','calf-extension','plank'],
+  cardioDay: [],
+  rest: [],
+};
+const SPECIAL_ITEMS = {
+  cardioDay: [
+    ["Treadmill or Elliptical — Zone 2 steady state","30-35 min @ 140-152bpm"],
+    ["Recumbent bike — easy spin (optional add-on)","10-15 min"],
+    ["Mat: full-body mobility/stretch","10 min"],
+  ],
+  rest: [
+    ["Light walk (optional)","20-30 min, easy pace"],
+    ["Mat: Mobility / stretching","10-15 min"],
+  ],
+};
+
+// ================= Muscle diagram (generic abstract body map) =================
+const BODY_FRONT_SVG = `<svg viewBox="0 0 200 400" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="100" cy="30" r="18" class="body-region" data-region="head" style="pointer-events:none;"/>
+  <rect x="92" y="46" width="16" height="14" class="body-region" data-region="head" style="pointer-events:none;"/>
+  <ellipse cx="65" cy="78" rx="22" ry="15" class="body-region" data-region="shoulders"/>
+  <ellipse cx="135" cy="78" rx="22" ry="15" class="body-region" data-region="shoulders"/>
+  <rect x="62" y="70" width="76" height="52" rx="12" class="body-region" data-region="chest"/>
+  <ellipse cx="48" cy="130" rx="16" ry="38" class="body-region" data-region="biceps"/>
+  <ellipse cx="152" cy="130" rx="16" ry="38" class="body-region" data-region="biceps"/>
+  <ellipse cx="42" cy="196" rx="13" ry="34" class="body-region" data-region="forearms"/>
+  <ellipse cx="158" cy="196" rx="13" ry="34" class="body-region" data-region="forearms"/>
+  <rect x="68" y="122" width="64" height="60" rx="10" class="body-region" data-region="abs"/>
+  <ellipse cx="78" cy="252" rx="22" ry="52" class="body-region" data-region="quads"/>
+  <ellipse cx="122" cy="252" rx="22" ry="52" class="body-region" data-region="quads"/>
+  <ellipse cx="78" cy="342" rx="15" ry="38" class="body-region" data-region="calves"/>
+  <ellipse cx="122" cy="342" rx="15" ry="38" class="body-region" data-region="calves"/>
+</svg>`;
+const BODY_BACK_SVG = `<svg viewBox="0 0 200 400" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="100" cy="30" r="18" class="body-region" data-region="head" style="pointer-events:none;"/>
+  <rect x="92" y="46" width="16" height="14" class="body-region" data-region="head" style="pointer-events:none;"/>
+  <ellipse cx="65" cy="78" rx="22" ry="15" class="body-region" data-region="shoulders"/>
+  <ellipse cx="135" cy="78" rx="22" ry="15" class="body-region" data-region="shoulders"/>
+  <ellipse cx="62" cy="136" rx="21" ry="42" class="body-region" data-region="lats"/>
+  <ellipse cx="138" cy="136" rx="21" ry="42" class="body-region" data-region="lats"/>
+  <rect x="64" y="68" width="72" height="36" rx="10" class="body-region" data-region="upperback"/>
+  <rect x="74" y="150" width="52" height="30" rx="8" class="body-region" data-region="lowerback"/>
+  <ellipse cx="48" cy="130" rx="16" ry="38" class="body-region" data-region="triceps"/>
+  <ellipse cx="152" cy="130" rx="16" ry="38" class="body-region" data-region="triceps"/>
+  <ellipse cx="42" cy="196" rx="13" ry="34" class="body-region" data-region="forearms"/>
+  <ellipse cx="158" cy="196" rx="13" ry="34" class="body-region" data-region="forearms"/>
+  <ellipse cx="78" cy="222" rx="24" ry="26" class="body-region" data-region="glutes"/>
+  <ellipse cx="122" cy="222" rx="24" ry="26" class="body-region" data-region="glutes"/>
+  <ellipse cx="78" cy="282" rx="20" ry="40" class="body-region" data-region="hamstrings"/>
+  <ellipse cx="122" cy="282" rx="20" ry="40" class="body-region" data-region="hamstrings"/>
+  <ellipse cx="78" cy="342" rx="15" ry="38" class="body-region" data-region="calves"/>
+  <ellipse cx="122" cy="342" rx="15" ry="38" class="body-region" data-region="calves"/>
+</svg>`;
+const FRONT_REGIONS = ['chest','shoulders','biceps','forearms','abs','quads','calves'];
+const BACK_REGIONS = ['upperback','lats','lowerback','triceps','glutes','hamstrings','calves'];
+
+function renderDiagramFor(ex){
+  const el = document.getElementById('bodyDiagram');
+  const frontScore = ex.primary.filter(r=>FRONT_REGIONS.includes(r)).length;
+  const backScore = ex.primary.filter(r=>BACK_REGIONS.includes(r)).length;
+  const view = backScore > frontScore ? 'back' : 'front';
+  el.innerHTML = view==='front' ? BODY_FRONT_SVG : BODY_BACK_SVG;
+  el.querySelectorAll('[data-region]').forEach(node=>{
+    const r = node.getAttribute('data-region');
+    if(ex.primary.includes(r)) node.classList.add('primary');
+    else if(ex.secondary.includes(r)) node.classList.add('secondary');
+  });
+}
+
+// ================= Audio: beeps/ticks for timers and set completion =================
+let audioCtx;
+function ensureAudio(){
+  try{
+    if(!audioCtx) audioCtx = new (window.AudioContext||window.webkitAudioContext)();
+    if(audioCtx.state==='suspended') audioCtx.resume();
+  }catch(e){}
+}
+function beep(freq, dur){
+  try{
+    ensureAudio();
+    const o = audioCtx.createOscillator(), g = audioCtx.createGain();
+    o.frequency.value = freq; o.type='sine';
+    g.gain.setValueAtTime(0.001, audioCtx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.16, audioCtx.currentTime+0.01);
+    g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime+dur/1000);
+    o.connect(g); g.connect(audioCtx.destination);
+    o.start(); o.stop(audioCtx.currentTime + dur/1000 + 0.02);
+  }catch(e){}
+}
+function tripleBeep(){ beep(880,120); setTimeout(()=>beep(880,120),170); setTimeout(()=>beep(1300,240),340); }
+function tick(){ beep(660,80); }
+
+// ================= Exercise detail overlay state =================
+let currentExSlug=null, currentDaySlugs=[], currentSets=[], currentSetIndex=0, currentRec=null;
+let timerInterval=null, timerRunning=false, timerRemaining=0;
+
+function getTodayKey(){ return new Date().toISOString().slice(0,10); }
+function daySlugList(type){ return DAY_EXERCISES[type] || []; }
+function numSets(scheme){ const m = scheme.match(/^(\d+)x/); return m ? parseInt(m[1]) : 3; }
+function fmtTime(s){ s=Math.max(0,s); const m=Math.floor(s/60), sec=s%60; return `${m}:${sec.toString().padStart(2,'0')}`; }
+
+function ensureCompletedToday(){
+  const today = getTodayKey();
+  const type = document.getElementById('dayType').value;
+  if(!state.completedToday || state.completedToday.date!==today || state.completedToday.dayType!==type){
+    state.completedToday = {date:today, dayType:type, slugs:[]};
+  }
+  return state.completedToday;
+}
+
+function getLastPerformance(slug){
+  const hist = state.exerciseHistory[slug];
+  return (hist && hist.length) ? hist[hist.length-1] : null;
+}
+
+function recommendFor(slug, ex){
+  const last = getLastPerformance(slug);
+  if(!last){
+    return {cold:true, weight:null,
+      text: ex.counterType==='time'
+        ? `No history yet — hold for a duration that's genuinely hard on the last 10 seconds, then log your actual time. Starting point: ${ex.counterTarget}s.`
+        : `No history yet — pick a weight where the last 1-2 reps of your last set feel genuinely hard, then log what you actually lifted.`};
+  }
+  if(ex.counterType==='time'){
+    const allHit = last.sets.every(s=>s.duration>=ex.counterTarget);
+    const base = last.sets[0].duration || ex.counterTarget;
+    const next = allHit ? base+5 : base;
+    return {cold:false, targetDuration: next,
+      text:`Last time: ${last.sets.map(s=>s.duration+'s').join(', ')}. ${allHit?'Try holding a little longer today:':'Repeat the same hold time today:'} ~${next}s.`};
+  } else {
+    const lastWeight = Math.max(...last.sets.map(s=>s.weight||0));
+    const allHitReps = last.sets.every(s=>s.reps >= ex.counterTarget);
+    const isBarbell = /barbell/i.test(ex.display);
+    const inc = isBarbell ? 2.5 : 2;
+    const nextWeight = allHitReps ? +(lastWeight+inc).toFixed(1) : lastWeight;
+    return {cold:false, weight: nextWeight,
+      text:`Last time: ${last.sets.map(s=>s.weight+'kg × '+s.reps).join(', ')}. ${allHitReps?'Small bump today (all reps hit last time):':'Same weight — focus on hitting all target reps:'} ~${nextWeight}kg.`};
+  }
+}
+
+function renderRecommendation(slug, ex){
+  currentRec = recommendFor(slug, ex);
+  document.getElementById('exRecommend').innerHTML = `<div class="small">${currentRec.text}</div>`;
+}
+function renderInstructions(ex){
+  document.getElementById('exInstructions').innerHTML = ex.instructions.map(s=>`<li style="margin-bottom:6px;">${s}</li>`).join('');
+}
+function renderLoggedSetsTable(){
+  if(!currentSets.length) return '';
+  return '<div style="margin-top:12px;">' + currentSets.map((s,i)=>
+    `<div class="set-row"><span>Set ${i+1}</span><span class="muted">${s.duration!=null ? s.duration+'s' : (s.weight+'kg × '+s.reps+' reps')}</span></div>`
+  ).join('') + '</div>';
+}
+
+function renderCounterArea(slug, ex){
+  const totalSets = numSets(ex.scheme);
+  const area = document.getElementById('exCounterArea');
+  if(currentSetIndex >= totalSets){
+    area.innerHTML = `<div class="small" style="color:var(--good)">All ${totalSets} sets logged for today ✓ — slide below to finish this exercise.</div>` + renderLoggedSetsTable();
+    document.getElementById('sliderLabel').textContent = 'Slide to mark exercise done →';
+    return;
+  }
+  if(ex.counterType==='time'){
+    const startVal = (currentRec && currentRec.targetDuration) ? currentRec.targetDuration : ex.counterTarget;
+    window._timerTarget = startVal;
+    timerRemaining = startVal;
+    area.innerHTML = `
+      <div class="small muted" style="text-align:center;">Set ${currentSetIndex+1} of ${totalSets} — hold timer</div>
+      <div class="counter-box">
+        <button class="counter-btn" id="timerMinus">−5s</button>
+        <div class="counter-num" id="timerNum">${fmtTime(startVal)}</div>
+        <button class="counter-btn" id="timerPlus">+5s</button>
+      </div>
+      <div class="flexbtns" style="justify-content:center;">
+        <button class="btn" id="timerStart">Start</button>
+        <button class="btn secondary" id="logSetBtn">Log this set</button>
+      </div>` + renderLoggedSetsTable();
+    document.getElementById('timerMinus').onclick = ()=>{ if(!timerRunning){ window._timerTarget=Math.max(5,window._timerTarget-5); timerRemaining=window._timerTarget; document.getElementById('timerNum').textContent=fmtTime(timerRemaining);} };
+    document.getElementById('timerPlus').onclick = ()=>{ if(!timerRunning){ window._timerTarget+=5; timerRemaining=window._timerTarget; document.getElementById('timerNum').textContent=fmtTime(timerRemaining);} };
+    document.getElementById('timerStart').onclick = ()=>startCountdown(ex);
+    document.getElementById('logSetBtn').onclick = ()=>{ stopTimer(); logCurrentSet(ex, {duration: window._timerTarget}); };
+  } else {
+    const startWeight = (currentRec && currentRec.weight!=null) ? currentRec.weight : '';
+    area.innerHTML = `
+      <div class="small muted" style="text-align:center;">Set ${currentSetIndex+1} of ${totalSets} — tap each rep as you do it</div>
+      <div class="counter-box">
+        <button class="counter-btn" id="repMinus">−</button>
+        <div class="counter-num" id="repNum">0</div>
+        <button class="counter-btn" id="repPlus">+</button>
+      </div>
+      <div class="counter-target">Target: ${ex.counterTarget} reps</div>
+      <div class="row" style="max-width:200px;margin:12px auto 0;">
+        <div><label>Weight used (kg)</label><input type="number" step="0.5" id="setWeight" value="${startWeight}"></div>
+      </div>
+      <div class="flexbtns" style="justify-content:center;">
+        <button class="btn" id="logSetBtn">Log this set</button>
+      </div>` + renderLoggedSetsTable();
+    let repCount = 0;
+    document.getElementById('repPlus').onclick = ()=>{ repCount++; document.getElementById('repNum').textContent=repCount; ensureAudio(); tick(); };
+    document.getElementById('repMinus').onclick = ()=>{ repCount=Math.max(0,repCount-1); document.getElementById('repNum').textContent=repCount; };
+    document.getElementById('logSetBtn').onclick = ()=>{
+      const weight = parseFloat(document.getElementById('setWeight').value)||0;
+      logCurrentSet(ex, {reps:repCount, weight});
+    };
+  }
+}
+
+function startCountdown(ex){
+  if(timerRunning) return;
+  ensureAudio();
+  timerRunning = true;
+  document.getElementById('timerStart').textContent = 'Pause';
+  timerInterval = setInterval(()=>{
+    timerRemaining--;
+    const numEl = document.getElementById('timerNum');
+    if(numEl) numEl.textContent = fmtTime(Math.max(0,timerRemaining));
+    if(timerRemaining<=3 && timerRemaining>0) tick();
+    if(timerRemaining<=0){
+      stopTimer();
+      tripleBeep();
+      logCurrentSet(ex, {duration: window._timerTarget});
+    }
+  }, 1000);
+}
+function stopTimer(){
+  timerRunning=false;
+  if(timerInterval) clearInterval(timerInterval);
+  timerInterval=null;
+  const btn = document.getElementById('timerStart');
+  if(btn) btn.textContent='Start';
+}
+
+function logCurrentSet(ex, data){
+  currentSets.push(data);
+  currentSetIndex++;
+  tripleBeep();
+  renderCounterArea(currentExSlug, ex);
+}
+
+// ---- Slide-to-complete ----
+function resetSlider(){
+  const track = document.getElementById('sliderTrack');
+  track.classList.remove('complete');
+  document.getElementById('sliderFill').style.width = '0';
+  document.getElementById('sliderThumb').style.left = '3px';
+  document.getElementById('sliderLabel').textContent = currentSets.length ? 'Slide to mark exercise done →' : 'Log at least one set, then slide →';
+}
+function initSlider(){
+  const thumb = document.getElementById('sliderThumb');
+  let dragging = false;
+  thumb.addEventListener('pointerdown', (e)=>{ dragging=true; thumb.setPointerCapture(e.pointerId); });
+  thumb.addEventListener('pointermove', (e)=>{
+    if(!dragging) return;
+    const track = document.getElementById('sliderTrack');
+    const rect = track.getBoundingClientRect();
+    let x = e.clientX - rect.left - 25;
+    x = Math.max(3, Math.min(x, rect.width-53));
+    thumb.style.left = x+'px';
+    document.getElementById('sliderFill').style.width = (x/(rect.width-56)*100)+'%';
+  });
+  function finish(){
+    if(!dragging) return;
+    dragging = false;
+    const track = document.getElementById('sliderTrack');
+    const rect = track.getBoundingClientRect();
+    const left = parseFloat(thumb.style.left||3);
+    const pct = left/(rect.width-56);
+    if(pct > 0.7 && currentSets.length){ completeExercise(); }
+    else { resetSlider(); }
+  }
+  thumb.addEventListener('pointerup', finish);
+  thumb.addEventListener('pointercancel', finish);
+}
+
+function completeExercise(){
+  const track = document.getElementById('sliderTrack');
+  track.classList.add('complete');
+  document.getElementById('sliderLabel').textContent = 'Done ✓';
+  document.getElementById('sliderFill').style.width = '100%';
+  document.getElementById('sliderThumb').style.left = 'calc(100% - 53px)';
+  tripleBeep();
+  if(currentSets.length){
+    if(!state.exerciseHistory[currentExSlug]) state.exerciseHistory[currentExSlug] = [];
+    state.exerciseHistory[currentExSlug].push({date:getTodayKey(), sets:currentSets});
+  }
+  const ct = ensureCompletedToday();
+  if(!ct.slugs.includes(currentExSlug)) ct.slugs.push(currentExSlug);
+  persist();
+  renderExList();
+  renderGreeting();
+  setTimeout(()=>{
+    const idx = currentDaySlugs.indexOf(currentExSlug);
+    const next = currentDaySlugs[idx+1];
+    if(next) openExercise(next); else closeOverlay();
+  }, 550);
+}
+
+// ---- Open/close overlay ----
+function startFrameLoop(images){
+  stopFrameLoop();
+  let i = 0;
+  const img = document.getElementById('exFrame');
+  img.src = images[0];
+  window._frameTimer = setInterval(()=>{ i = 1-i; img.src = images[i]; }, 900);
+}
+function stopFrameLoop(){ if(window._frameTimer) clearInterval(window._frameTimer); }
+
+function updateOverlayProgress(){
+  const idx = currentDaySlugs.indexOf(currentExSlug);
+  document.getElementById('exProgress').textContent = `Exercise ${idx+1} of ${currentDaySlugs.length}`;
+}
+
+function openExercise(slug){
+  currentExSlug = slug;
+  const ex = EXERCISES[slug];
+  currentDaySlugs = daySlugList(document.getElementById('dayType').value);
+  currentSets = [];
+  currentSetIndex = 0;
+  document.getElementById('exTitle').textContent = ex.display;
+  document.getElementById('exScheme').textContent = ex.scheme + (ex.counterType==='time' ? ' hold' : ' reps');
+  startFrameLoop(ex.images);
+  renderDiagramFor(ex);
+  renderInstructions(ex);
+  renderRecommendation(slug, ex);
+  renderCounterArea(slug, ex);
+  updateOverlayProgress();
+  resetSlider();
+  document.getElementById('exOverlay').classList.add('active');
+}
+function closeOverlay(){
+  document.getElementById('exOverlay').classList.remove('active');
+  stopFrameLoop();
+  stopTimer();
+}
+document.getElementById('exClose').addEventListener('click', closeOverlay);
+initSlider();
+
+// ================= Today's session list =================
+function renderExList(){
+  const type = document.getElementById('dayType').value;
+  state.lastDayType = type;
+  document.getElementById('sessionTitle').textContent = DAY_META[type].title;
+  const list = document.getElementById('exList');
+  list.innerHTML = '';
+  const ct = ensureCompletedToday();
+
+  const slugs = DAY_EXERCISES[type] || [];
+  slugs.forEach(slug=>{
+    const ex = EXERCISES[slug];
+    const done = ct.slugs.includes(slug);
+    const li = document.createElement('li');
+    li.className = done ? 'done' : '';
+    li.innerHTML = `<div class="check">✓</div><div class="exname">${ex.display}<div class="exsub">${ex.scheme}</div></div>`;
+    li.addEventListener('click', ()=>openExercise(slug));
+    list.appendChild(li);
+  });
+  (SPECIAL_ITEMS[type]||[]).forEach(([name,scheme])=>{
+    const li = document.createElement('li');
+    li.style.cursor = 'default';
+    li.innerHTML = `<div class="check" style="border-style:dashed;"></div><div class="exname" style="color:var(--muted);font-weight:400;">${name}<div class="exsub">${scheme}</div></div>`;
+    list.appendChild(li);
+  });
+
+  renderCooldown(type, slugs);
+  persist();
+}
+document.getElementById('dayType').addEventListener('change', renderExList);
+document.getElementById('clearSession').addEventListener('click', ()=>{
+  state.completedToday = {date:getTodayKey(), dayType:document.getElementById('dayType').value, slugs:[]};
+  renderExList();
+  persist();
+});
+
+// ================= Cooldown / stretch (auto-matched to today's muscle groups) =================
+function renderCooldown(type, slugs){
+  const card = document.getElementById('cooldownCard');
+  const list = document.getElementById('cooldownList');
+  if(!slugs.length){ card.style.display='none'; return; }
+  const regionsHit = new Set();
+  slugs.forEach(s=>{ const ex=EXERCISES[s]; ex.primary.forEach(r=>regionsHit.add(r)); ex.secondary.forEach(r=>regionsHit.add(r)); });
+  const picks = STRETCHES.filter(st=>st.regions.some(r=>regionsHit.has(r)));
+  if(!picks.length){ card.style.display='none'; return; }
+  card.style.display='block';
+  list.innerHTML = '';
+  picks.forEach((st,i)=>{
+    const li = document.createElement('li');
+    li.innerHTML = `<div class="check" style="border-style:dashed;"></div><div class="exname" style="font-weight:500;">${st.name}<div class="exsub">${st.note} · ${st.hold}s hold</div></div>`;
+    li.addEventListener('click', ()=>openStretch(st));
+    list.appendChild(li);
+  });
+}
+function openStretch(st){
+  currentExSlug = null; currentDaySlugs = []; currentSets=[{duration:st.hold}]; currentSetIndex=1;
+  document.getElementById('exTitle').textContent = st.name;
+  document.getElementById('exScheme').textContent = `${st.hold}s hold`;
+  stopFrameLoop();
+  document.getElementById('exFrame').removeAttribute('src');
+  document.getElementById('exProgress').textContent = 'Cooldown stretch';
+  renderDiagramForRegions(st.regions);
+  document.getElementById('exInstructions').innerHTML = `<li>${st.note}</li>`;
+  document.getElementById('exRecommend').innerHTML = `<div class="small">Hold gently — a stretch should feel like tension, never pain. ${st.hold}s per side if applicable.</div>`;
+  const area = document.getElementById('exCounterArea');
+  window._timerTarget = st.hold; timerRemaining = st.hold;
+  area.innerHTML = `
+    <div class="counter-box">
+      <button class="counter-btn" id="timerMinus">−5s</button>
+      <div class="counter-num" id="timerNum">${fmtTime(st.hold)}</div>
+      <button class="counter-btn" id="timerPlus">+5s</button>
+    </div>
+    <div class="flexbtns" style="justify-content:center;"><button class="btn" id="timerStart">Start</button></div>`;
+  document.getElementById('timerMinus').onclick = ()=>{ if(!timerRunning){ window._timerTarget=Math.max(5,window._timerTarget-5); timerRemaining=window._timerTarget; document.getElementById('timerNum').textContent=fmtTime(timerRemaining);} };
+  document.getElementById('timerPlus').onclick = ()=>{ if(!timerRunning){ window._timerTarget+=5; timerRemaining=window._timerTarget; document.getElementById('timerNum').textContent=fmtTime(timerRemaining);} };
+  document.getElementById('timerStart').onclick = ()=>{
+    if(timerRunning) return;
+    ensureAudio(); timerRunning=true;
+    document.getElementById('timerStart').textContent='Pause';
+    timerInterval = setInterval(()=>{
+      timerRemaining--;
+      document.getElementById('timerNum').textContent = fmtTime(Math.max(0,timerRemaining));
+      if(timerRemaining<=3 && timerRemaining>0) tick();
+      if(timerRemaining<=0){ stopTimer(); tripleBeep(); }
+    }, 1000);
+  };
+  resetSlider();
+  document.getElementById('sliderLabel').textContent = 'Slide when done →';
+  document.getElementById('exOverlay').classList.add('active');
+}
+function renderDiagramForRegions(regions){
+  const el = document.getElementById('bodyDiagram');
+  const frontScore = regions.filter(r=>FRONT_REGIONS.includes(r)).length;
+  const backScore = regions.filter(r=>BACK_REGIONS.includes(r)).length;
+  const view = backScore > frontScore ? 'back' : 'front';
+  el.innerHTML = view==='front' ? BODY_FRONT_SVG : BODY_BACK_SVG;
+  el.querySelectorAll('[data-region]').forEach(node=>{
+    if(regions.includes(node.getAttribute('data-region'))) node.classList.add('primary');
+  });
+}
 
 const dietItems = [
   "Breakfast: 3 eggs (or 2 whole + 3 whites) + 2 roti / oats bowl",
@@ -399,43 +1052,19 @@ function renderGoalRow(){
   `;
 }
 
-// ================= Today's session =================
-function renderSession(){
-  const type = document.getElementById('dayType').value;
-  state.lastDayType = type;
-  const t = templates[type];
-  document.getElementById('sessionTitle').textContent = t.title;
-  const list = document.getElementById('exList');
-  list.innerHTML = '';
-  t.ex.forEach(([name,scheme])=>{
-    const li = document.createElement('li');
-    li.innerHTML = `<div class="exname">${name}<div class="exsub">${scheme}</div></div>
-      <input type="text" inputmode="decimal" placeholder="kg" class="weightIn">
-      <input type="text" inputmode="numeric" placeholder="reps" class="repsIn">`;
-    list.appendChild(li);
-  });
-  persist();
-}
-document.getElementById('dayType').addEventListener('change', renderSession);
-
-document.getElementById('saveSession').addEventListener('click', ()=>{
-  const type = document.getElementById('dayType').value;
-  const cardio = document.getElementById('cardioToggle').value;
-  const rows = [...document.querySelectorAll('#exList li')].map(li=>{
-    const name = li.querySelector('.exname').firstChild.textContent;
-    const w = li.querySelector('.weightIn').value;
-    const r = li.querySelector('.repsIn').value;
-    return `${name}: ${w||'-'}kg x ${r||'-'}`;
-  }).join(' | ');
-  state.sessions.unshift({date:new Date().toISOString().slice(0,10), type:templates[type].title, notes: rows + (cardio==='yes' ? ' + Zone2 cardio 20-30min' : '')});
-  renderHistory();
-  persist();
-});
-document.getElementById('clearSession').addEventListener('click', renderSession);
-
+// ================= Recent exercise history (derived from state.exerciseHistory) =================
 function renderHistory(){
+  const rows = [];
+  Object.keys(state.exerciseHistory).forEach(slug=>{
+    const ex = EXERCISES[slug];
+    (state.exerciseHistory[slug]||[]).forEach(entry=>{
+      const summary = entry.sets.map(s=> s.duration!=null ? s.duration+'s' : (s.weight+'kg×'+s.reps)).join(', ');
+      rows.push({date:entry.date, name:ex ? ex.display : slug, summary});
+    });
+  });
+  rows.sort((a,b)=> b.date.localeCompare(a.date));
   const tb = document.getElementById('sessionHistory');
-  tb.innerHTML = state.sessions.slice(0,10).map(s=>`<tr><td>${s.date}</td><td>${s.type}</td><td class="small muted">${s.notes}</td></tr>`).join('') || '<tr><td colspan="3" class="muted small">No sessions logged yet.</td></tr>';
+  tb.innerHTML = rows.slice(0,15).map(r=>`<tr><td>${r.date}</td><td>${r.name}</td><td class="small muted">${r.summary}</td></tr>`).join('') || '<tr><td colspan="3" class="muted small">No exercises logged yet — tap into an exercise on Today and log a set.</td></tr>';
 }
 
 // ================= Progress log =================
@@ -545,6 +1174,110 @@ function renderAll(){
   renderChart();
 }
 
+// ================= Calorie tracker =================
+document.getElementById('foodDate').value = new Date().toISOString().slice(0,10);
+
+function populateFoodOptions(){
+  const dl = document.getElementById('foodOptions');
+  dl.innerHTML = FOOD_DB.map(f=>`<option value="${f[0]}">`).join('');
+}
+
+function findFood(name){
+  return FOOD_DB.find(f=> f[0].toLowerCase() === name.trim().toLowerCase());
+}
+
+function updateFoodPreview(){
+  const name = document.getElementById('foodName').value;
+  const grams = parseFloat(document.getElementById('foodGrams').value);
+  const preview = document.getElementById('foodPreview');
+  const match = findFood(name);
+  const customRow = document.getElementById('customFoodRow');
+  if(match && grams>0){
+    const [,, p, c, f] = match;
+    const kcal = match[1]*grams/100;
+    preview.textContent = `≈ ${Math.round(kcal)} kcal, ${(match[2]*grams/100).toFixed(1)}g protein, ${(match[3]*grams/100).toFixed(1)}g carbs, ${(match[4]*grams/100).toFixed(1)}g fat`;
+    customRow.style.display = 'none';
+  } else if(name && !match){
+    preview.textContent = 'Not in the built-in list — use "Add custom" below to enter values per 100g.';
+  } else {
+    preview.textContent = '';
+  }
+}
+document.getElementById('foodName').addEventListener('input', updateFoodPreview);
+document.getElementById('foodGrams').addEventListener('input', updateFoodPreview);
+document.getElementById('customFoodBtn').addEventListener('click', ()=>{
+  const row = document.getElementById('customFoodRow');
+  row.style.display = row.style.display==='none' ? 'block' : 'none';
+});
+
+document.getElementById('addFood').addEventListener('click', ()=>{
+  const date = document.getElementById('foodDate').value || new Date().toISOString().slice(0,10);
+  const name = document.getElementById('foodName').value.trim();
+  const grams = parseFloat(document.getElementById('foodGrams').value);
+  if(!name || !grams || grams<=0){ alert('Enter a food name and a positive amount in grams/ml.'); return; }
+  const match = findFood(name);
+  let per100;
+  if(match){
+    per100 = {kcal:match[1], protein:match[2], carbs:match[3], fat:match[4]};
+  } else {
+    const kcal = parseFloat(document.getElementById('customKcal').value);
+    if(isNaN(kcal)){ alert('This food isn\'t in the list — fill in the custom kcal/100g field (protein/carbs/fat optional).'); return; }
+    per100 = {
+      kcal,
+      protein: parseFloat(document.getElementById('customProtein').value)||0,
+      carbs: parseFloat(document.getElementById('customCarbs').value)||0,
+      fat: parseFloat(document.getElementById('customFat').value)||0,
+    };
+  }
+  const entry = {
+    name, grams,
+    kcal: Math.round(per100.kcal*grams/100),
+    protein: +(per100.protein*grams/100).toFixed(1),
+    carbs: +(per100.carbs*grams/100).toFixed(1),
+    fat: +(per100.fat*grams/100).toFixed(1),
+  };
+  if(!state.foodLog[date]) state.foodLog[date] = [];
+  state.foodLog[date].push(entry);
+  document.getElementById('foodName').value = '';
+  document.getElementById('foodGrams').value = '';
+  document.getElementById('customKcal').value = '';
+  document.getElementById('customProtein').value = '';
+  document.getElementById('customCarbs').value = '';
+  document.getElementById('customFat').value = '';
+  document.getElementById('customFoodRow').style.display = 'none';
+  updateFoodPreview();
+  renderCalories();
+  persist();
+});
+document.getElementById('foodDate').addEventListener('change', renderCalories);
+
+function deleteFoodEntry(date, idx){
+  state.foodLog[date].splice(idx,1);
+  renderCalories();
+  persist();
+}
+
+function renderCalories(){
+  const date = document.getElementById('foodDate').value || new Date().toISOString().slice(0,10);
+  const entries = state.foodLog[date] || [];
+  document.getElementById('foodLogDateLabel').textContent = date;
+  const tb = document.getElementById('foodLogTable');
+  tb.innerHTML = entries.map((e,i)=>`
+    <tr><td>${e.name}</td><td>${e.grams}g</td><td>${e.kcal}</td><td>${e.protein}g</td>
+    <td><button class="btn ghost" style="padding:3px 8px;font-size:.75rem" onclick="deleteFoodEntry('${date}',${i})">✕</button></td></tr>
+  `).join('') || '<tr><td colspan="5" class="muted small">Nothing logged for this date yet.</td></tr>';
+
+  const totals = entries.reduce((a,e)=>({kcal:a.kcal+e.kcal, protein:a.protein+e.protein, carbs:a.carbs+e.carbs, fat:a.fat+e.fat}), {kcal:0,protein:0,carbs:0,fat:0});
+  const kcalLeft = CAL_TARGET - totals.kcal;
+  const proteinLeft = PROTEIN_TARGET - totals.protein;
+  document.getElementById('calSummary').innerHTML = `
+    <div class="goal-card"><div class="label">Calories eaten</div><div class="val">${Math.round(totals.kcal)} <small>/ ${CAL_TARGET}</small></div></div>
+    <div class="goal-card"><div class="label">Protein eaten</div><div class="val">${totals.protein.toFixed(0)}g <small>/ ${PROTEIN_TARGET}g</small></div></div>
+    <div class="goal-card"><div class="label">${kcalLeft>=0?'Calories left':'Over by'}</div><div class="val" style="color:${kcalLeft<0?'var(--bad)':'var(--good)'}">${Math.abs(Math.round(kcalLeft))}</div></div>
+    <div class="goal-card"><div class="label">Carbs / Fat</div><div class="val" style="font-size:1rem">${totals.carbs.toFixed(0)}g / ${totals.fat.toFixed(0)}g</div></div>
+  `;
+}
+
 // ================= Diet checklist =================
 function renderDiet(){
   const el = document.getElementById('dietChecklist');
@@ -611,7 +1344,7 @@ document.getElementById('importFile').addEventListener('change', (e)=>{
     try{
       const data = JSON.parse(reader.result);
       Object.assign(state, data);
-      renderSession(); renderHistory(); renderDiet(); computeZones(); renderAll();
+      renderExList(); renderHistory(); renderDiet(); computeZones(); renderAll(); renderCalories();
       persist();
       alert('Data imported.');
     }catch(err){ alert('Invalid file.'); }
@@ -620,16 +1353,37 @@ document.getElementById('importFile').addEventListener('change', (e)=>{
 });
 
 // ================= Storage info =================
+function exerciseLogCount(){
+  return Object.values(state.exerciseHistory||{}).reduce((n,arr)=>n+arr.length, 0);
+}
+function renderGreeting(){
+  const el = document.getElementById('greeting');
+  const dates = new Set();
+  Object.values(state.exerciseHistory||{}).forEach(arr=>arr.forEach(e=>dates.add(e.date)));
+  const sorted = [...dates].sort();
+  if(!sorted.length){ el.textContent = "Let's train."; return; }
+  // simple current streak: count back consecutive days ending today/yesterday
+  let streak = 0;
+  let cursor = new Date();
+  for(;;){
+    const key = cursor.toISOString().slice(0,10);
+    if(dates.has(key)){ streak++; cursor.setDate(cursor.getDate()-1); }
+    else if(streak===0 && key===getTodayKey()){ cursor.setDate(cursor.getDate()-1); continue; }
+    else break;
+  }
+  el.textContent = streak>0 ? `${streak}-day streak — keep it going.` : "Let's train.";
+}
 async function renderStorageInfo(){
   const el = document.getElementById('storageInfo');
+  const summary = `${state.logs.length} weight entries, ${exerciseLogCount()} exercises logged on this device.`;
   if(navigator.storage && navigator.storage.estimate){
     try{
       const est = await navigator.storage.estimate();
       const usedKB = ((est.usage||0)/1024).toFixed(1);
-      el.innerHTML = `Using ~${usedKB} KB of local storage. ${state.logs.length} weight entries, ${state.sessions.length} workout sessions saved on this device.`;
-    }catch(e){ el.textContent = `${state.logs.length} weight entries, ${state.sessions.length} workout sessions saved on this device.`; }
+      el.innerHTML = `Using ~${usedKB} KB of local storage. ${summary}`;
+    }catch(e){ el.textContent = summary; }
   } else {
-    el.textContent = `${state.logs.length} weight entries, ${state.sessions.length} workout sessions saved on this device.`;
+    el.textContent = summary;
   }
 }
 
@@ -660,12 +1414,15 @@ async function init(){
   document.getElementById('rhrInput').value = state.hrSettings.rhr;
   document.getElementById('maxhrInput').value = state.hrSettings.maxhr;
   document.getElementById('ageInput').value = state.hrSettings.age;
-  renderSession();
+  renderExList();
   renderHistory();
   renderDiet();
   computeZones();
   renderAll();
   renderStorageInfo();
+  populateFoodOptions();
+  renderCalories();
+  renderGreeting();
 }
 init();
 window.addEventListener('resize', renderChart);
